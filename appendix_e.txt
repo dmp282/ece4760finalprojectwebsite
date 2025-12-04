@@ -1,0 +1,614 @@
+Appendix E: References and ChatGPT logs 
+
+References: 
+
+
+***Chat GPT Logs:***
+BITMAPPING HELP:
+
+INTERACTION 1: -----------------------------------------------------------------------------------
+User: "how to bitmap a 7404 ic image to a vga display?"
+
+ChatGPT: Here’s the whole process of how to take a bitmap image of a 7404 IC (or any small image) and display it on a VGA screen using a microcontroller such as the RP2040, MSP430, PIC, AVR, etc.
+
+✅ 1. Understand the VGA Format You’re Outputting
+
+Most student VGA projects use:
+
+Resolution: 640×480 or 320×240
+
+Color: 8-bit or 16-bit RGB
+
+Frame buffer: Either full framebuffer in RAM or tile-based / line-based rendering
+
+Before anything else, ask yourself:
+
+Do you have a full framebuffer in RAM?
+
+RP2040 with PIO often has a framebuffer if resolution is low (e.g., 320×240).
+
+Many MCUs cannot hold a framebuffer (640×480×2 bytes ≈ 614 kB).
+
+If you can’t store a full framebuffer, you must stream the bitmap line-by-line.
+
+✅ 2. Convert Your IC Image into a Bitmap
+
+You need the image in a simple format the microcontroller can store.
+
+A. Choose your target bitmap format
+
+Most common format:
+
+RGB565 (16-bit) 
+
+
+Or if you only have 1 bit per pixel:
+
+1-bit monochrome (black/white)
+
+B. Resize the 7404 IC image
+
+Use GIMP, Paint.NET, or online tools:
+
+Resize to something like 64×32 or 128×64
+
+Reduce color depth (e.g., grayscale or monochrome)
+
+C. Export as raw pixel array
+
+You can use online tools:
+"image2cpp" (Arduino tool) → produces C array.
+
+This gives you something like:
+
+const uint16_t ic7404_bitmap[64*32] = {
+    0xFFFF, 0xFFFF, 0x0000, …
+};
+
+
+or for 1-bit monochrome:
+
+const uint8_t ic7404_bitmap[] = {
+    0xFF, 0xE0, 0x7C, 0x3F, ...
+};
+
+✅ 3. Store the Bitmap in Flash
+
+Put it in flash memory:
+
+const uint16_t ic7404_bitmap[2048] __attribute__((aligned(4))) = { … };
+
+✅ 4. Draw Bitmap to VGA Framebuffer
+
+If you have a framebuffer (e.g., uint16_t framebuf[320][240]):
+
+Example: Copy bitmap at position (x0, y0)
+void draw_bitmap16(int x0, int y0, int w, int h, const uint16_t *bitmap)
+{
+    for (int y=0; y<h; y++) {
+        for (int x=0; x<w; x++) {
+            framebuf[y0+y][x0+x] = bitmap[y*w + x];
+        }
+    }
+}
+
+
+Usage:
+
+draw_bitmap16(100, 50, 64, 32, ic7404_bitmap);
+
+✅ 5. If You Have No Framebuffer (RP2040 line-based VGA)
+
+You must render line by line in the scanline callback.
+
+Pseudo-code:
+
+void vga_line_callback(uint16_t *linebuffer, int y)
+{
+    if (y >= IC_Y && y < IC_Y + IC_HEIGHT) {
+        int row = y - IC_Y;
+        for (int x=IC_X; x<IC_X+IC_WIDTH; x++) {
+            int col = x - IC_X;
+            linebuffer[x] = ic7404_bitmap[row * IC_WIDTH + col];
+        }
+    }
+}
+
+✅ 6. If the Image Is 1-bit (Monochrome)
+
+Use bit masking:
+
+if (bitmap[row * bytes_per_row + (col>>3)] & (0x80 >> (col & 7)))
+    pixel = WHITE;
+else
+    pixel = BLACK;
+
+✅ 7. Summary Checklist
+
+✔ Resize the 7404 image
+✔ Convert to RGB565 or monochrome array
+✔ Store array in flash
+✔ Copy pixels into your VGA framebuffer or write per-scanline
+✔ Test with small images first
+
+If you show me:
+
+✔ your microcontroller (RP2040? MSP430? PIC? AVR?)
+✔ your VGA driver code
+✔ your working display resolution
+✔ the exact 7404 image you want to convert
+
+I can generate the bitmap C array for you and write the exact drawing function for your display system.
+
+
+INTERACTION 2: -----------------------------------------------------------------------------------
+User: "update this function: "void draw_ic_chip(int x, int y) { int ic_width = 80; int ic_height = 120; fillRect(x, y, ic_width, ic_height, BLACK); drawRect(x, y, ic_width, ic_height, WHITE); }" so that this bitmap is inside the rectangle:"
+
+ChatGPT: Here’s the clean and correct way to update your draw_ic_chip() function so that it renders your 80×120 16-bit bitmap inside the rectangle.
+
+I’m assuming:
+
+ic7404_bitmap[] is RGB565 raw pixel data, one 16-bit value per pixel.
+
+You already have a function like drawPixel(x, y, color) available (typical for VGA libraries on RP2040).
+
+You want the bitmap drawn at the top-left of the rectangular area.
+
+✅ Updated Function
+void draw_ic_chip(int x, int y) {
+    int ic_width  = 80;
+    int ic_height = 120;
+
+    // Draw background and border
+    fillRect(x, y, ic_width, ic_height, BLACK);
+    drawRect(x, y, ic_width, ic_height, WHITE);
+
+    // Draw bitmap inside the chip area
+    for (int row = 0; row < ic_height; row++) {
+        for (int col = 0; col < ic_width; col++) {
+            uint16_t pixel = ic7404_bitmap[row * ic_width + col];
+
+            // Skip transparent pixels if you want transparency:
+            // if (pixel == 0x0000) continue;
+
+            drawPixel(x + col, y + row, pixel);
+        }
+    }
+}
+
+✔ Notes / Tips
+1. Bitmap indexing
+
+Your bitmap is linear, so pixel (col, row) is at:
+
+row * ic_width + col
+
+2. If your VGA library expects RGB332 or RGB888
+
+If your VGA code uses a different format, convert:
+
+uint8_t r = (pixel >> 11) & 0x1F;
+uint8_t g = (pixel >> 5)  & 0x3F;
+uint8_t b = pixel & 0x1F;
+
+
+I can help adjust the converter if needed.
+
+3. If you want transparency
+
+Just skip drawing black pixels:
+
+if (pixel == 0x0000) continue;
+
+
+If you want, I can also write you a bitmap scaling version, a rotated 7404 IC, or a bitmap compression/flash-storage version."
+
+
+
+*********************DFF Code Assistance:******************************************************************************************************
+
+
+User: "ICTestDisplay test_NOR(ICTestDisplay  test) {
+    PEinit() ;
+    bool correct = 1;
+
+    //reset status LEDs
+    gpio_put(LED_RED, 0);
+    gpio_put(LED_GREEN, 0);
+
+    //set ports for inverter
+    // 1 --> output
+    // 0 --> input
+    PEgpioSetDir(PORTA, 0xdb) ; // 1101 1011 --> 0xdb
+    
+    PEgpioSetDir(PORTB, 0xf6) ; // 1111 0110 --> 0xf6
+
+    //results 
+    bool actual_output[4];
+
+    // Test 1 
+    // Set input --> 00
+    // Expected output --> 1
+    PEwriteBit(PORTA, 0, 0) ; //output A2 (pin 10)
+    PEwriteBit(PORTA, 1, 0) ;
+
+    PEwriteBit(PORTA, 3, 0) ; //output A5 (pin 13)
+    PEwriteBit(PORTA, 4, 0) ;
+
+    PEwriteBit(PORTB, 1, 0) ; //output B0 (pin 1)
+    PEwriteBit(PORTB, 2, 0) ;
+
+    PEwriteBit(PORTB, 4, 0) ; //output B3 (pin 4)
+    PEwriteBit(PORTB, 5, 0) ;
+
+
+    //read output 
+    actual_output[0] = PEreadBit(PORTB, 0) ; //pin 1
+    actual_output[1] = PEreadBit(PORTB, 3) ; //pin 4
+    actual_output[2] = PEreadBit(PORTA, 2) ; //pin 10
+    actual_output[3] = PEreadBit(PORTA, 5) ; //pin 13
+
+
+    //testing...
+    for (int gate_num = 0; gate_num < 4; gate_num+=1) {
+        if(actual_output[gate_num] != 1) {
+            //Trigger VGA draw 
+            printf("001 Fault for NOR gate %d \n", gate_num) ;
+            gpio_put(LED_RED, 1);
+            correct = 0;
+            test.overall_pass = 0;
+            switch(gate_num){
+                case 0: 
+                    test.pins[0].failed = true;
+                    break;
+                case 1:
+                    test.pins[3].failed = true;
+                    break;
+                case 2:
+                    test.pins[9].failed = true;
+                    break;
+                case 3:
+                    test.pins[12].failed = true;
+                    break;
+            }
+        } 
+    }
+
+    // Test 2
+    // Set input --> 01
+    // Expected output --> 0
+    PEwriteBit(PORTA, 0, 0) ; //output A2 (pin 10)
+    PEwriteBit(PORTA, 1, 1) ;
+
+    PEwriteBit(PORTA, 3, 0) ; //output A5 (pin 13)
+    PEwriteBit(PORTA, 4, 1) ;
+
+    PEwriteBit(PORTB, 1, 0) ; //output B0 (pin 1)
+    PEwriteBit(PORTB, 2, 1) ;
+
+    PEwriteBit(PORTB, 4, 0) ; //output B3 (pin 4)
+    PEwriteBit(PORTB, 5, 1) ;
+
+
+    //read output 
+    actual_output[0] = PEreadBit(PORTB, 0) ; //pin 1
+    actual_output[1] = PEreadBit(PORTB, 3) ; //pin 4
+    actual_output[2] = PEreadBit(PORTA, 2) ; //pin 10
+    actual_output[3] = PEreadBit(PORTA, 5) ; //pin 13
+
+
+    //testing...
+    for (int gate_num = 0; gate_num < 4; gate_num+=1) {
+        if(actual_output[gate_num] != 0) {
+            //Trigger VGA draw 
+            printf("010 Fault for NOR gate %d \n", gate_num) ;
+            gpio_put(LED_RED, 1);
+            correct = 0;
+            test.overall_pass = 0;
+            switch(gate_num){
+                case 0: 
+                    test.pins[0].failed = true;
+                    break;
+                case 1:
+                    test.pins[3].failed = true;
+                    break;
+                case 2:
+                    test.pins[9].failed = true;
+                    break;
+                case 3:
+                    test.pins[12].failed = true;
+                    break;
+            }
+        } 
+    }
+
+
+    // Test 3
+    // Set input --> 10
+    // Expected output --> 0
+    PEwriteBit(PORTA, 0, 1) ; //output A2 (pin 10)
+    PEwriteBit(PORTA, 1, 0) ;
+
+    PEwriteBit(PORTA, 3, 1) ; //output A5 (pin 13)
+    PEwriteBit(PORTA, 4, 0) ;
+
+    PEwriteBit(PORTB, 1, 1) ; //output B0 (pin 1)
+    PEwriteBit(PORTB, 2, 0) ;
+
+    PEwriteBit(PORTB, 4, 1) ; //output B3 (pin 4)
+    PEwriteBit(PORTB, 5, 0) ;
+
+
+    //read output 
+    actual_output[0] = PEreadBit(PORTB, 0) ; //pin 1
+    actual_output[1] = PEreadBit(PORTB, 3) ; //pin 4
+    actual_output[2] = PEreadBit(PORTA, 2) ; //pin 10
+    actual_output[3] = PEreadBit(PORTA, 5) ; //pin 13
+
+
+    //testing...
+    for (int gate_num = 0; gate_num < 4; gate_num+=1) {
+        if(actual_output[gate_num] != 0) {
+            //Trigger VGA draw 
+            printf("100 Fault for NOR gate %d \n", gate_num) ;
+            gpio_put(LED_RED, 1);
+            correct = 0;
+            test.overall_pass = 0;
+            switch(gate_num){
+                case 0: 
+                    test.pins[0].failed = true;
+                    break;
+                case 1:
+                    test.pins[3].failed = true;
+                    break;
+                case 2:
+                    test.pins[9].failed = true;
+                    break;
+                case 3:
+                    test.pins[12].failed = true;
+                    break;
+            }
+        } 
+    }
+
+
+    // Test 4
+    // Set input --> 11
+    // Expected output --> 0
+    PEwriteBit(PORTA, 0, 1) ; //output A2 (pin 10)
+    PEwriteBit(PORTA, 1, 1) ;
+
+    PEwriteBit(PORTA, 3, 1) ; //output A5 (pin 13)
+    PEwriteBit(PORTA, 4, 1) ;
+
+    PEwriteBit(PORTB, 1, 1) ; //output B0 (pin 1)
+    PEwriteBit(PORTB, 2, 1) ;
+
+    PEwriteBit(PORTB, 4, 1) ; //output B3 (pin 4)
+    PEwriteBit(PORTB, 5, 1) ;
+
+
+    //read output 
+    actual_output[0] = PEreadBit(PORTB, 0) ; //pin 1
+    actual_output[1] = PEreadBit(PORTB, 3) ; //pin 4
+    actual_output[2] = PEreadBit(PORTA, 2) ; //pin 10
+    actual_output[3] = PEreadBit(PORTA, 5) ; //pin 13
+
+
+    //testing...
+    for (int gate_num = 0; gate_num < 4; gate_num+=1) {
+        if(actual_output[gate_num] != 0) {
+            //Trigger VGA draw 
+            printf("001 Fault for NOR gate %d \n", gate_num) ;
+            gpio_put(LED_RED, 1);
+            correct = 0;
+            test.overall_pass = 0;
+            switch(gate_num){
+                case 0: 
+                    test.pins[0].failed = true;
+                    break;
+                case 1:
+                    test.pins[3].failed = true;
+                    break;
+                case 2:
+                    test.pins[9].failed = true;
+                    break;
+                case 3:
+                    test.pins[12].failed = true;
+                    break;
+            }
+        } 
+    }
+
+    //return values
+    if(correct == 1){
+        gpio_put(LED_GREEN, 1);
+        test.overall_pass = 1;
+    }
+    return test;
+    	
+}
+
+
+ICTestDisplay test_DFF(ICTestDisplay  test) {
+    PEinit() ;
+    bool correct = 1;
+
+    //reset status LEDs
+    gpio_put(LED_RED, 0);
+    gpio_put(LED_GREEN, 0);
+
+    //TODO: set ports for DFF
+    // 1 --> output
+    // 0 --> input
+    PEgpioSetDir(PORTA, 0xf6) ; // 1111 0110 --> 0xf6 15 6
+    
+    PEgpioSetDir(PORTB, 0xdb) ; // 1101 1011 --> 0xdb 13 11
+
+    //results 
+    bool actual_output[2];
+
+    //Clock Cycle 1 
+    PEwriteBit(PORTA, 2, 1) ; //PR (A2, pin 10)
+    PEwriteBit(PORTA, 3, ) ; //Clk (A3, pin 11)
+    PEwriteBit(PORTA, 4, ) ; //D (A4, pin 12)
+    PEwriteBit(PORTA, 5, 1) ; //CLR (A5, pin 13)
+   
+    actual_output[0] = PEreadBit(PORTB, 0) ; //pin 1
+
+
+
+
+}"
+
+ChatGPT: "Here’s a cleaned-up and corrected version of your D-flip-flop test code, along with a pin-mapping template and completed write statements.
+I’m assuming you’re testing a 74HC74 / 7474-type dual D-flip-flop (1DFF and 2DFF).
+If your pinout is different, tell me — I can adjust it.
+
+✅ Corrected + Completed test_DFF() Skeleton
+
+Below is a fixed version that matches your style from test_NOR(), with placeholders removed and missing bits filled in.
+
+I assume this mapping based on your PORT direction masks:
+
+PORTA (0xF6 = 1111 0110)
+
+Bit → Direction
+
+A1 = 0 → input
+
+A2 = 1 → output
+
+A3 = 1 → output
+
+A4 = 1 → output
+
+A5 = 1 → output
+(you appear to be driving PR, CLK, D, CLR)
+
+PORTB (0xDB = 1101 1011)
+
+B0 = 1 → output
+
+B1 = 1 → input
+
+B2 = 0 → input
+
+B3 = 1 → output
+
+B4 = 1 → input
+
+B5 = 0 → input
+(outputs appear to be Q and Q̅)
+
+If this is inverted, tell me and I’ll fix it.
+
+✅ Completed version
+ICTestDisplay test_DFF(ICTestDisplay test) {
+    PEinit();
+    bool correct = 1;
+
+    // reset LEDs
+    gpio_put(LED_RED, 0);
+    gpio_put(LED_GREEN, 0);
+
+    // Set port directions for DFF
+    // 1 = output, 0 = input
+    PEgpioSetDir(PORTA, 0xf6); // PR, CLK, D, CLR → outputs
+    PEgpioSetDir(PORTB, 0xdb); // Q, Q̅ inputs on B1 and B2
+
+    bool actual_output[2]; // [0] = Q, [1] = /Q
+
+    //
+    // ******* CLOCK CYCLE 1 ********
+    //
+
+    // Inputs for first cycle
+    // NOTE: adjust if your pin mapping differs!
+    PEwriteBit(PORTA, 2, 1); // PR = 1
+    PEwriteBit(PORTA, 3, 0); // CLK = 0 (initial)
+    PEwriteBit(PORTA, 4, 1); // D = 1
+    PEwriteBit(PORTA, 5, 1); // CLR = 1
+
+    sleep_us(5);
+
+    // rising edge → latch D
+    PEwriteBit(PORTA, 3, 1);
+    sleep_us(5);
+
+    // read Q and /Q
+    actual_output[0] = PEreadBit(PORTB, 1); // Q
+    actual_output[1] = PEreadBit(PORTB, 2); // /Q
+
+    // Expected: Q = 1, /Q = 0
+    if (actual_output[0] != 1 || actual_output[1] != 0) {
+        printf("Fault: DFF failed Clock Cycle 1\n");
+        gpio_put(LED_RED, 1);
+        correct = 0;
+        test.overall_pass = 0;
+
+        test.pins[0].failed = true; // adjust which pins represent Q/Q̅
+    }
+
+    //
+    // ******* CLOCK CYCLE 2: test D=0 ********
+    //
+
+    PEwriteBit(PORTA, 3, 0); // CLK low
+    PEwriteBit(PORTA, 4, 0); // change D to 0
+    sleep_us(5);
+
+    // rising edge again
+    PEwriteBit(PORTA, 3, 1);
+    sleep_us(5);
+
+    actual_output[0] = PEreadBit(PORTB, 1); // Q
+    actual_output[1] = PEreadBit(PORTB, 2); // /Q
+
+    if (actual_output[0] != 0 || actual_output[1] != 1) {
+        printf("Fault: DFF failed Clock Cycle 2\n");
+        gpio_put(LED_RED, 1);
+        correct = 0;
+        test.overall_pass = 0;
+
+        test.pins[0].failed = true;
+    }
+
+    //
+    // ******* FINAL RETURN ********
+    //
+
+    if (correct == 1) {
+        gpio_put(LED_GREEN, 1);
+        test.overall_pass = 1;
+    }
+
+    return test;
+}
+
+✅ Tell me your chip pinout so I can finalize
+
+To complete this 100% accurately, I need:
+
+✔ Which pin numbers correspond to:
+
+PR
+
+CLR
+
+CLK
+
+D
+
+Q
+
+Q̅
+
+✔ Which port bits go to which IC pins
+
+(e.g., “A2 → PR (pin 10)” like in your NOR tester).
+
+Once you give that, I’ll deliver a fully correct final test_DFF() matching your hardware.
+
+Want me to also write a matching VGA result display like your NOR tester?"
+
