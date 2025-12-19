@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Automated Test Equipment</title>
+    <title>ThurGroup9</title>
 
     <!-- Bootstrap core CSS -->
     <link href="dist/css/bootstrap.min.css" rel="stylesheet">
@@ -42,19 +42,17 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">ATE74IC</a>
+          <a class="navbar-brand" href="#">Automated Test Equipment for 74-Series Integrated Circuits (ATE74IC)</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="#demo">Demo</a></li>
             <li><a href="#intro">Introduction</a></li>
-            <li><a href="#design">High Level Design</a></li>
-            <li><a href="#hardware">Hardware</a></li>
-            <li><a href="#software">Software</a></li>
+            <li><a href="#obj">Project Objective</a></li>
+            <li><a href="#design">Design</a></li>
+            <li><a href="#drawings">Drawings</a></li>
+            <li><a href="#testing">Testing</a></li>
             <li><a href="#result">Result</a></li>
-            <li><a href="#conclusion">Conclusion</a></li>
-            <li><a href="#appendix">Appendix</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -63,62 +61,428 @@
     <div class="container">
 
       <div class="starter-template">
-        <h1>Automated Test Equipment for 7400-series ICs</h1>
-        <p class="lead">ECE 4760 Fall 2025<br>Diane Pillsbury (dmp282)</p>
+        <h1>Automated Test Equipment</h1>
+        <p class="lead">12/13/2025<br>Michelle Yang (my394), Diane Pillsbury (dmp282), Xia Yan Zhao (xz834)</p>
       </div>
 
-      <hr>
       <div class="center-block">
-          <iframe width="640" height="360" src="https://www.youtube.com/embed?v=et91Gea6CPk" frameborder="0" allowfullscreen></iframe>
-          <h4 style="text-align:center;">Demonstration Video</h4>
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/owWskybi2ng?si=0u_G-Jf5qSAFXC5r" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <h4 style="text-align:center;">Automated IC tester with Raspberry Pi Pico Demonstration Video</h4>
       </div>
+      
 
       <hr id="intro">
 
-      <div style="text-align:center; font-size:18px">
+      <div style="text-align:center;">
               <h2>Introduction</h2>
-              <p style="text-align: left;padding: 0px 30px;"></p>
+              <p style="text-align: left;padding: 0px 30px;">
+                <strong>Sound Bite:</strong> “The ATE74IC can automatically test a variety of 74-series integrated circuits with the press of a button, preventing users from wasting time with faulty circuits”.
+              </p>
+              <p style="text-align: left;padding: 0px 30px;">
+                <strong>Summary:</strong> The ATE74IC is a testing device that tests the validity of each gate within each IC chip. This project tested specifically 6 IC chips: NAND, NOT, OR, AND, D Flip Flop, and NOR. These are common chips used to design complex ASIC designs and processors. Ensuring these chips work is crucial in developing digital electronics as they are vital to developing everyday systems that people use.
+              </p>
       </div>
 
+    <hr id='obj'>
 
     <hr id='design'>
 
       <div style="text-align:center;">
               <h2>High Level Design</h2>
-              
-        </div>
+              <p style="text-align: left;padding: 0px 30px;">
+                blablabla
+              </p>
+              <h4 style="text-align: left;padding: 0px 30px;" > <u>Rationale and Sources:</u></h4>
+              <p style="text-align: left;padding: 0px 30px;">
+                Automated test equipment is used extensively in the semiconductor industry to quickly test chips for manufacturing flaws; as integrated circuits and systems-on-chip grow increasingly complex, testing each internal connection becomes difficult, so equipment to automatically run tests becomes necessary. However, aspects of semiconductor testing, including Design for Test, post-silicon validation, and automated test equipment, are rarely mentioned in undergraduate-level courses. Additionally, having equipment to test ICs commonly used in digital electronics courses would be greatly beneficial, as would save time working with faulty chips. We designed the ATE74IC to provide an accessible interface for undergraduates to test simple 74-series ICs. 
+              </p>
+              <h4 style="text-align: left;padding: 0px 30px;" > <u>Background:</u></h4>
+              <p style="text-align: left;padding: 0px 30px;">
+                A selection of 7400-series integrated circuits were chosen as the units-under-test (UUTs) for this project since the 7400-series is an industry standard commonly used in many digital electronics courses. 
+              </p>
+              <ul>
+                <li style="text-align: left;padding: 0px 30px;">
+                  <strong>Discuss ICs</strong><br>
+                  blablablablabalbalaablablablablabalbalaablablablablabalbalaablablablablabalbalaa
+                </li><br>
+                <li style="text-align: left;padding: 0px 30px;">
+                  <strong>Discuss ATEs</strong><br>
+                  blablablablabalbalaablablablablabalbalaablablablablabalbalaablablablablabalbalaa
+                </li><br>
+                <li style="text-align: left;padding: 0px 30px;">
+                  <strong>Discuss VGA</strong><br>
+                  blablablablabalbalaablablablablabalbalaablablablablabalbalaablablablablabalbalaa
+                </li><br>
+                <li style="text-align: left;padding: 0px 30px;">
+                  <strong>Discuss audio</strong><br>
+                  blablablablabalbalaablablablablabalbalaablablablablabalbalaablablablablabalbalaa
+                </li>
+              </ul>
+              <h4 style="text-align: left;padding: 0px 30px;" > <u>Logical Structure:</u></h4>
+              <p style="text-align: left;padding: 0px 30px;">
+                We found it most intuitive to divide the code into multiple files for this project due to the scope and necessity of asynchronous work. We put the “main” function, all code for protothreads, button, VGA, LED, and DAC in a file entitled “ate.c”. However, all test functions were placed in a file titled “atpg.c”, (Automated Test Pattern Generator). Variables needed in ate.c and atpg.c are in a “ate_variables.c”, which is included in atpg.c. Additionally, due to the length of bitmap arrays, they were placed in a separate file entitled “bitmap.c.” Similarly, the arrays encoding the audio samples were placed in separate header files (“audio_pass.h” and “audio_fail.h”). 
+              </p>
+              <p style="text-align: left;padding: 0px 30px;">
+                Additionally, we used semaphores to control when VGA and test protothreads ran; for example, calling the VGA semaphore after the button to toggle between ICs is pressed.
+              </p>
+              <img style="display: block; margin-left: auto; margin-right: auto; width: 50%;" src="pics/logic.png" alt="flowchart of program logic" width="240" height="240">
+              <h4 style="text-align: left;padding: 0px 30px;" > <u>Hardware/Software Tradeoffs</u></h4>
+              <p style="text-align: left;padding: 0px 30px;">
+                Since 7400-series ICs have 12 pins (not counting ground and VCC pins), we realized the number of GPIOs we had on a standard RP2040 would be inadequate if we wanted to also use buttons, LEDs, and a DAC. We decided that these were all important elements of the project which we did not wish to sacrifice, so we obtained a port expander (the MCP23s17). The port expander allows us to provide more digital I/O to the RP2040 at the expense of a slower clock rate. Since the test functions are relatively simple, the slower clock cycle was imperceptible to results speed. 
+              </p>
+              <br>
+              <h2>Program/hardware Design</h2>
+              <p style="text-align: left;padding: 0px 30px;">
+                blablabla
+              </p>
+              <h4 style="text-align: left;padding: 0px 30px;" > <u>Hardware</u></h4>
+              <p style="text-align: left;padding: 0px 30px;">
+                The hardware we used for the project was as follows: 
+              </p>
+              <ul>
+                <li style="text-align: left;padding: 0px 30px;">
+                  RP2040
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  Port expander (MCP23s17)
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  LEDs (One red and one green)
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  Buttons (two)
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  Two 330 Ohm resistors
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  VGA
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  VGA adapter
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  DAC
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  Audio Jack
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  Wires
+                </li>
+                <li style="text-align: left;padding: 0px 30px;">
+                  7400-series ICs (7400, 7402, 7404, 7408, 7432, 7474)
+                </li>
+              </ul>
+                <img style="display: block; margin-left: auto; margin-right: auto; width: 50%;" src="pics/ate_hw.png" alt="hardware ate image" width="240" height="240">
+                <img style="display: block; margin-left: auto; margin-right: auto; width: 50%;" src="pics/breadboard_logic.png" alt="circuit breadboard flowchart image" width="240" height="240">
 
-    <hr id='hardware'>
+                <table style="border: 1px solid black; border-collapse: collapse;">
+                  <caption>blbalbalbalba</caption>
+                  <thead>
+                    <tr>
+                      <th style="border: 1px solid black; padding: 8px;">RP2040 Pin</th>
+                      <th style="border: 1px solid black; padding: 8px;">Connection</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">GND</td>
+                      <td style="border: 1px solid black; padding: 8px;">VGA GND, DAC GND, Port Expander (VSS, AIN0, AIN1, AIN2), IC Pin 7</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">3.3 V</td>
+                      <td style="border: 1px solid black; padding: 8px;">DAC VCC, Port Expander (VDD, Reset), Toggle Button, Start Test Button</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">5 V</td>
+                      <td style="border: 1px solid black; padding: 8px;">IC Pin 14</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table style="border: 1px solid black; border-collapse: collapse;">
+                  <caption>blbalbalbalba</caption>
+                  <thead>
+                    <tr>
+                      <th style="border: 1px solid black; padding: 8px;">RP2040 GPIO Port</th>
+                      <th style="border: 1px solid black; padding: 8px;">Connection</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">2</td>
+                      <td style="border: 1px solid black; padding: 8px;">DAC timing ISR</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">5</td>
+                      <td style="border: 1px solid black; padding: 8px;">DAC Chip select</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">6</td>
+                      <td style="border: 1px solid black; padding: 8px;">DAC SCK</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">7</td>
+                      <td style="border: 1px solid black; padding: 8px;">DAC MOSI</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">8</td>
+                      <td style="border: 1px solid black; padding: 8px;">Green LED</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">9</td>
+                      <td style="border: 1px solid black; padding: 8px;">Red LED</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">10</td>
+                      <td style="border: 1px solid black; padding: 8px;">Port Expander SCK</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">11</td>
+                      <td style="border: 1px solid black; padding: 8px;">Port Expander TX</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">12</td>
+                      <td style="border: 1px solid black; padding: 8px;">Port Expander RX</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">13</td>
+                      <td style="border: 1px solid black; padding: 8px;">Port Expander CS</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">14</td>
+                      <td style="border: 1px solid black; padding: 8px;">Toggle Button</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">15</td>
+                      <td style="border: 1px solid black; padding: 8px;">Start Test Button</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">16</td>
+                      <td style="border: 1px solid black; padding: 8px;">VGA Hsync</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">17</td>
+                      <td style="border: 1px solid black; padding: 8px;">VGA Vsync</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">18</td>
+                      <td style="border: 1px solid black; padding: 8px;">470 ohm resistor -> VGA Green</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">19</td>
+                      <td style="border: 1px solid black; padding: 8px;">330 ohm resistor -> VGA Green</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">20</td>
+                      <td style="border: 1px solid black; padding: 8px;">330 ohm resistor -> VGA Blue</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">21</td>
+                      <td style="border: 1px solid black; padding: 8px;">330 ohm resistor -> VGA Red</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table style="border: 1px solid black; border-collapse: collapse;">
+                  <caption>blbalbalbalba</caption>
+                  <thead>
+                    <tr>
+                      <th style="border: 1px solid black; padding: 8px;">Port Expander Port</th>
+                      <th style="border: 1px solid black; padding: 8px;">IC Pin</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">A0</td>
+                      <td style="border: 1px solid black; padding: 8px;">8</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">A1</td>
+                      <td style="border: 1px solid black; padding: 8px;">9</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">A2</td>
+                      <td style="border: 1px solid black; padding: 8px;">10</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">A3</td>
+                      <td style="border: 1px solid black; padding: 8px;">11</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">A4</td>
+                      <td style="border: 1px solid black; padding: 8px;">12</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">A5</td>
+                      <td style="border: 1px solid black; padding: 8px;">13</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">B0</td>
+                      <td style="border: 1px solid black; padding: 8px;">1</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">B1</td>
+                      <td style="border: 1px solid black; padding: 8px;">2</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">B2</td>
+                      <td style="border: 1px solid black; padding: 8px;">3</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">B3</td>
+                      <td style="border: 1px solid black; padding: 8px;">4</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">B4</td>
+                      <td style="border: 1px solid black; padding: 8px;">5</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">B5</td>
+                      <td style="border: 1px solid black; padding: 8px;">6</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <h4 style="text-align: left;padding: 0px 30px;" > <u>Software:</u></h4>
+                <p style="text-align: left;padding: 0px 30px;">
+                  blablablabalbalablabalbalab
+                </p>
+                <ol>
+                  <li style="text-align: left;padding: 0px 30px;">
+                    atpg test file
+                  </li>
+                  <li style="text-align: left;padding: 0px 30px;">
+                    audio
+                  </li>
+                  <li style="text-align: left;padding: 0px 30px;">
+                    buttons
+                  </li>
+                </ol>
+                <p>The “atpg.c” file includes functions to test each UUT.</p>
+                <pre><code>
+//sample test 
+ICTestDisplay test_NOT (ICTestDisplay test){
+	//initialize
+
+	//Test 1
+	//update vga
+	//write to port expander 
+	//read from port expander
+	for (each gate){
+		if (output == expected){
+			update_for_pass();
+}else{
+	set_overall_fail();
+}
+update_display();
+}
+
+//rest of tests
+		
+		if(overall_pass){
+			update_display(pass);
+		}else {
+			update_display(fail):
+		}
+}
+                </code></pre>
+
+    <hr id='testing'>
 
       <div style="text-align:center;">
-              <h2>Hardware</h2>
+        <h2>AI Use</h2>
+        <p style="text-align: left;padding: 0px 30px;">
+          We used AI (ChatGPT) to generate some code, but all code was heavily modified from the ChatGPT output. The main use case was getting an example of how to do something in C which we didn’t already know how to do. 
+        </p>
       </div>
-
-    <hr id='software'>
-
-      <div style="text-align:center;">
-              <h2>Software</h2>
-      </div>
-   
 
     <hr id='result'>
 
       <div style="text-align:center;">
-              <h2>Result</h2>
+              <h2>Results of the Design</h2>
+              <p style="text-align: left;padding: 0px 30px;">
+                Our testing revealed that the ATE worked for all test ICs.
+              </p>
+              <p style="text-align: left;padding: 0px 30px;">
+                The green “Overall Pass” LED lit up only when all gates’ test cases passed, and the red “Overall Fail” LED lit up when one or more gates’ test cases failed, and the audio played. 
+              </p>
+              <table style="border: 1px solid black; border-collapse: collapse;">
+                  <caption>blbalbalbalba</caption>
+                  <thead>
+                    <tr>
+                      <th style="border: 1px solid black; padding: 8px;">7400-series IC Type</th>
+                      <th style="border: 1px solid black; padding: 8px;">Test Results</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">7400 (NAND)</td>
+                      <td style="border: 1px solid black; padding: 8px;">blbalablabla</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">7402 (NOR)</td>
+                      <td style="border: 1px solid black; padding: 8px;">blbalablabla</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">7404 (NOT)</td>
+                      <td style="border: 1px solid black; padding: 8px;">blbalablabla</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">7408 (AND)</td>
+                      <td style="border: 1px solid black; padding: 8px;">blbalablabla</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">7432 (OR)</td>
+                      <td style="border: 1px solid black; padding: 8px;">blbalablabla</td>
+                    </tr>
+                    <tr>
+                      <td style="border: 1px solid black; padding: 8px;">7474 (DFF)</td>
+                      <td style="border: 1px solid black; padding: 8px;">blbalablabla</td>
+                    </tr>
+                  </tbody>
+                </table>
+      </div>
+
+    <hr>
+    <div class="row">
+              <h2>Conclusions</h2>
+              <p style="text-align: left;padding: 0px 30px;">
+                Our ATE74IC successfully met its primary objective of automatically testing the 74-series logic ICs with a single debouncing button that switches between the different gates. The system accurately identifies and tests common logic gates (AND, OR, NOT, NAD, NOR, XOR, D Flip Flops) and displays results on a VGA monitor and circuit board LED with clear pass fail indicators. The RP2040 did not have enough GPIO pins so we used a port extender and it worked well. The truth table verification proved to be reliable for combinational logic testing. The user interface provided very clear feedback and is very intuitive for the users to understand. This application is good for educational or hobbyist applications. 
+              </p>
+              <p style="text-align: left;padding: 0px 30px;">
+                Next time, we believe we can have a more expanded IC library since we are only limited to basic gates and flip-flops. We can also include counters, registers, and more complex 74 series devices. Also, having a data logging system that allows exportation of test results via USB serial would be helpful for sharing among teams.
+              </p>
+              <p style="text-align: left;padding: 0px 30px;">
+                For code, we utilized Hunter Adam’s VGA graphics library for the RP2040, which is publicly available and documented for educational use in ECE 4760 class. The standard pico sdk libraries were used for GPIO control, spi communication, and hardware timers. Additionally, we used the MCP23S17 port expander library (mcp23s17_rp2040.h) provided by Bruce Land for spi-based GPIO expansion functionality. The test generation logic (atpg.c), user interface, the IC tests and state controls were our own original work. The IC chip visual representation displayed on the VGA interface use bitmap images so it would look neater on the VGA. These graphics are our original artwork based on standard IC package appearance and are not from any copyrighted material.
+              </p>
+              <p style="text-align: left;padding: 0px 30px;">
+                In terms of public domain usage, 74-series IC specifications are based on decades old designs now in the public domain. Logic function definitions are Boolean operations not subject to intellectual property protection. Truth tables and timing requirements were derived from publicly available datasheets from manufacturers (Texas Instruments, NXP, ON Semiconductor). We did not reverse engineer any commercial ATE system. Our test methodology is comparing actual IC outputs against expected truth tables. No proprietary testing algorithm or commercial test equipment designs were replicated.
+              </p>
+              <p style="text-align: left;padding: 0px 30px;">
+                Patents and trademarks: the 74 series is not trademarked because it is industry standard. Commercial ATE patents exist but are much better than our educational implementation. All components are standard commercial parts with no NDAs. This project presents no patent opportunities as IC testing is well-established technology
+              </p>
+      </div>
+
+
+    <hr>
+      <div class="row">
+        <h2>Appendix A (permission)</h2>
+        <p>
+          The group approves this report for inclusion on the course website.
+        </p>   
+        <h2>Source</h2>
+        <a href="https://people.ece.cornell.edu/land/courses/ece4760/pi_pico/more_io_ports/mcp23s17/index_mcp23s17.html" target="_blank" rel="noopener noreferrer">MCP23s17</a>
       </div>
       
 
-    <hr id="conclusion">
 
-      <div style="text-align:center;font-size:18px">
-              <h2>Conclusion</h2>
-              
-      </div>
 
-    
-
-    </div>
-
-   
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="dist/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <!-- <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script> -->
   </body>
 </html>
